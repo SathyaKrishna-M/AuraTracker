@@ -1,0 +1,164 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum Role {
+  USER
+  ADMIN
+}
+
+enum IncidentCategory {
+  SMALL_GAIN
+  MODERATE_GAIN
+  HIGH_GAIN
+  SMALL_LOSS
+  MODERATE_LOSS
+  HIGH_LOSS
+}
+
+enum IncidentStatus {
+  PENDING
+  VALIDATED
+  EXPIRED
+}
+
+// NextAuth Models
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// App Models
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+
+  // Custom Fields
+  aura      Int      @default(100)
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+
+  // Relations
+  ownedGroups      Group[]
+  memberships      GroupMember[]
+  createdIncidents Incident[]    @relation("CreatedBy")
+  targetedIncidents Incident[]   @relation("TargetedUser")
+  votes            IncidentVote[]
+  auraHistory      AuraHistory[]
+}
+
+model Group {
+  id         String   @id @default(cuid())
+  name       String
+  inviteCode String   @unique
+  ownerId    String
+  owner      User     @relation(fields: [ownerId], references: [id])
+  isFrozen   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  members   GroupMember[]
+  incidents Incident[]
+  auraHistory AuraHistory[]
+}
+
+model GroupMember {
+  userId   String
+  groupId  String
+  joinedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@id([userId, groupId])
+}
+
+model Incident {
+  id              String           @id @default(cuid())
+  groupId         String
+  targetUserId    String
+  createdByUserId String
+  category        IncidentCategory
+  title           String
+  description     String?
+  status          IncidentStatus   @default(PENDING)
+  requiredVotes   Int
+  expiresAt       DateTime
+  createdAt       DateTime         @default(now())
+  @@index([groupId])
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  targetUser  User           @relation("TargetedUser", fields: [targetUserId], references: [id])
+  createdByUser User         @relation("CreatedBy", fields: [createdByUserId], references: [id])
+  votes       IncidentVote[]
+  auraHistory AuraHistory[]
+}
+
+model IncidentVote {
+  incidentId String
+  userId     String
+  votedAt    DateTime @default(now())
+
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([incidentId, userId])
+}
+
+model AuraHistory {
+  id          String   @id @default(cuid())
+  userId      String
+  incidentId  String?
+  groupId     String?
+  delta       Int
+  reason      String
+  createdAt   DateTime @default(now())
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  incident Incident? @relation(fields: [incidentId], references: [id], onDelete: SetNull)
+  group    Group?    @relation(fields: [groupId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
