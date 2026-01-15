@@ -10,22 +10,21 @@ const config: Config = {
         extend: {
             colors: {
                 aura: {
-                    black: "#0a0a0a",
-                    dark: "#121212",
-                    card: "rgba(23, 23, 23, 0.7)",
-                    border: "rgba(255, 255, 255, 0.1)",
+                    black: "#0B0F14", // Deep background
+                    dark: "#121826", // Surface
+                    card: "rgba(255, 255, 255, 0.06)", // Glass surface
+                    border: "rgba(255, 255, 255, 0.08)", // Subtle border
                 },
                 accent: {
-                    DEFAULT: "#8b5cf6", // Violet
-                    glow: "#a78bfa",
-                    secondary: "#10b981", // Emerald
-                    warn: "#f97316", // Orange
+                    DEFAULT: "#3B82F6", // Blue
+                    glow: "#60A5FA", // Light Blue
+                    secondary: "#10B981", // Emerald
+                    warn: "#F97316", // Orange
                 }
             },
             backgroundImage: {
-                "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-                "gradient-aura": "linear-gradient(to bottom right, #0a0a0a, #1a1a2e, #0a0a0a)",
-                "glass": "linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.0) 100%)",
+                "glass": "linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%)",
+                "glass-hover": "linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%)",
             },
             animation: {
                 "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",

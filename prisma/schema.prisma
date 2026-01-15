@@ -97,6 +97,8 @@ model Group {
   ownerId    String
   owner      User     @relation(fields: [ownerId], references: [id])
   isFrozen   Boolean  @default(false)
+  emoji      String   @default("👥")
+  bgColor    String   @default("#3B82F6")
   createdAt  DateTime @default(now())
 
   members   GroupMember[]

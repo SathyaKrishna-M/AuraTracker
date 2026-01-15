@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Shield, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getAuraTitle } from "@/lib/aura-utils";
 
 interface Props {
     params: {
@@ -21,7 +22,6 @@ export default async function GroupLeaderboardPage({ params }: Props) {
 
     const groupId = params.id;
 
-    // 1. Fetch Group & Members
     const group = await prisma.group.findUnique({
         where: { id: groupId },
         include: {
@@ -37,49 +37,43 @@ export default async function GroupLeaderboardPage({ params }: Props) {
         return <div>Group not found</div>;
     }
 
-    // 2. Auth Check: Member or Admin
-    // Use 'any' type for find method to avoid strict boolean context issues with complex prisma types if needed, 
-    // but standard find should work.
     const isMember = group.members.some((m) => m.userId === session.user.id);
     const isAdmin = session.user.role === "ADMIN";
 
     if (!isMember && !isAdmin) {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="text-center">
-                    <Shield className="mx-auto h-12 w-12 text-zinc-500 mb-4" />
-                    <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
-                    <p className="text-zinc-400 mb-4">You must be a member of this group to view the leaderboard.</p>
-                    <Link href="/groups" className="text-indigo-400 hover:text-indigo-300">
-                        Back to Groups
-                    </Link>
-                </div>
-            </div>
-        );
+        redirect("/groups");
     }
 
-    // 3. Sort Users by Aura DESC
     const rankedMembers = [...group.members].sort((a, b) => b.user.aura - a.user.aura);
 
     return (
-        <div className="min-h-screen bg-black text-white p-6">
+        <div className="min-h-screen bg-aura-black text-white p-6 pb-24">
             <div className="max-w-2xl mx-auto space-y-8">
 
                 {/* Header */}
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-4 border-b border-aura-border pb-6">
                     <Link
                         href={`/groups/${groupId}`}
-                        className="p-2 hover:bg-zinc-900 rounded-full transition-colors"
+                        className="p-2 hover:bg-white/5 rounded-full transition-colors border border-transparent hover:border-aura-border"
                     >
-                        <ArrowLeft className="w-6 h-6" />
+                        <ArrowLeft className="w-5 h-5 text-gray-400" />
                     </Link>
-                    <div>
-                        <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                            {group.name} Leaderboard
-                        </h1>
-                        <p className="text-zinc-400 text-sm">
-                            Ranked by Aura Score
-                        </p>
+
+                    <div className="flex items-center gap-3">
+                        <div
+                            className="w-12 h-12 rounded-full flex items-center justify-center text-xl shadow-md border border-aura-border"
+                            style={{ backgroundColor: (group as any).bgColor || "#3B82F6" }}
+                        >
+                            {(group as any).emoji || "👥"}
+                        </div>
+                        <div>
+                            <h1 className="text-xl font-bold text-white tracking-tight">
+                                {group.name}
+                            </h1>
+                            <p className="text-xs font-medium text-accent uppercase tracking-widest mt-1">
+                                Official Rankings
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -98,44 +92,64 @@ export default async function GroupLeaderboardPage({ params }: Props) {
                             <div
                                 key={member.userId}
                                 className={cn(
-                                    "flex items-center p-4 rounded-xl border transition-all",
+                                    "flex items-center p-4 rounded-xl border transition-all duration-300",
                                     isCurrentUser
-                                        ? "bg-zinc-900/50 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.1)]"
-                                        : "bg-zinc-950 border-zinc-900"
+                                        ? "bg-accent/10 border-accent/40 shadow-[0_0_20px_rgba(59,130,246,0.15)] relative z-10"
+                                        : "bg-aura-dark border-aura-border hover:bg-white/5"
                                 )}
                             >
                                 {/* Rank */}
-                                <div className="w-12 flex-shrink-0 flex items-center justify-center text-xl font-bold text-zinc-500">
-                                    {rankBadge || `#${rank}`}
+                                <div className="w-10 flex-shrink-0 flex items-center justify-center text-xl font-bold">
+                                    {rankBadge || <span className="text-gray-600 text-sm">#{rank}</span>}
                                 </div>
 
                                 {/* Avatar & Name */}
-                                <div className="flex-1 min-w-0 ml-2">
-                                    <div className="flex items-center space-x-2">
-                                        <span className="font-medium truncate text-zinc-200">
-                                            {member.user.name || "Anonymous"}
-                                        </span>
-                                        {isCurrentUser && (
-                                            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-400/10 rounded-full">
-                                                You
-                                            </span>
+                                <div className="flex-1 min-w-0 ml-3 flex items-center gap-3">
+                                    <div className={cn(
+                                        "w-10 h-10 rounded-full overflow-hidden border-2",
+                                        isCurrentUser ? "border-accent" : "border-aura-border"
+                                    )}>
+                                        {member.user.image ? (
+                                            <img src={member.user.image} alt="" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full bg-aura-black flex items-center justify-center text-xs font-bold text-gray-500">
+                                                {member.user.name?.[0]}
+                                            </div>
                                         )}
+                                    </div>
+
+                                    <div className="flex flex-col">
+                                        <div className="flex items-center gap-2">
+                                            <span className={cn(
+                                                "font-bold text-sm truncate",
+                                                isCurrentUser ? "text-white" : "text-gray-300"
+                                            )}>
+                                                {member.user.name || "Anonymous"}
+                                            </span>
+                                            {isCurrentUser && (
+                                                <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-accent bg-accent/10 rounded">
+                                                    You
+                                                </span>
+                                            )}
+                                        </div>
+                                        <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">
+                                            {getAuraTitle(member.user.aura)}
+                                        </span>
                                     </div>
                                 </div>
 
                                 {/* Aura Score */}
-                                <div className="text-right">
+                                <div className="text-right pl-4">
                                     <span className={cn(
-                                        "text-xl font-bold font-mono",
+                                        "text-xl font-black monospace-num block leading-none",
                                         member.user.aura >= 100 ? "text-emerald-400"
-                                            : member.user.aura > 50 ? "text-zinc-200"
+                                            : member.user.aura > 50 ? "text-gray-100"
                                                 : "text-red-400"
                                     )}>
                                         {member.user.aura}
                                     </span>
-                                    <span className="text-xs text-zinc-500 block">AURA</span>
+                                    <span className="text-[9px] font-bold text-gray-600 uppercase tracking-wider">AURA</span>
                                 </div>
-
                             </div>
                         );
                     })}

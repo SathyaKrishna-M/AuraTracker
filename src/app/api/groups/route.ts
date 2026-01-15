@@ -41,11 +41,13 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
-        const { name } = body;
+        const { name, emoji, bgColor } = body;
 
         const group = await prisma.group.create({
             data: {
                 name,
+                emoji: emoji || "👥",
+                bgColor: bgColor || "#3B82F6",
                 inviteCode: Math.random().toString(36).substring(2, 10),
                 ownerId: session.user.id,
                 members: {

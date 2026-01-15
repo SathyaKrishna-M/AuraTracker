@@ -4,51 +4,62 @@
 
 @layer base {
   :root {
-    --background: 10 10 10;
-    --foreground: 255 255 255;
+    --background: 11 15 20;
+    --foreground: 229 231 235;
   }
 
   body {
-    @apply bg-aura-black text-white min-h-screen selection:bg-accent-glow selection:text-white;
-    background-image:
-      radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15), transparent 25%),
-      radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.15), transparent 25%);
-    background-attachment: fixed;
+    @apply bg-aura-black text-gray-200 min-h-screen selection:bg-accent selection:text-white font-sans antialiased;
   }
 }
 
 @layer components {
+
+  /* Minimal Glass - Only for Cards */
   .glass-panel {
-    @apply bg-aura-card backdrop-blur-md border border-aura-border shadow-xl;
+    @apply bg-aura-card backdrop-blur-md border border-aura-border shadow-lg transition-all duration-200;
   }
 
-  .glass-button {
-    @apply bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-sm transition-all duration-300 active:scale-95;
+  .glass-card {
+    @apply bg-aura-card border border-aura-border rounded-xl backdrop-blur-sm;
+  }
+
+  /* Interactive Elements */
+  .btn-primary {
+    @apply bg-accent hover:bg-accent/90 text-white font-medium px-4 py-2.5 rounded-lg active:scale-95 transition-all text-sm shadow-lg shadow-accent/20;
+  }
+
+  .btn-secondary {
+    @apply bg-aura-dark hover:bg-white/5 border border-aura-border text-gray-300 font-medium px-4 py-2.5 rounded-lg active:scale-95 transition-all text-sm;
   }
 
   .nav-item {
-    @apply flex flex-col items-center justify-center gap-1 text-xs text-neutral-500 transition-colors hover:text-white;
+    @apply flex flex-col items-center justify-center gap-1.5 text-[10px] font-medium text-gray-500 transition-colors py-1;
   }
 
   .nav-item.active {
-    @apply text-accent-glow;
+    @apply text-accent;
+  }
+
+  .monospace-num {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   }
 }
 
-/* Custom Scrollbar for Webkit */
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: #0B0F14;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 4px;
+  background: #1F2937;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #374151;
 }
