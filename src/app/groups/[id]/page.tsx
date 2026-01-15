@@ -65,10 +65,18 @@ export default async function GroupDetailPage({
                             <span>Owner: {group.owner.name}</span>
                         </div>
                     </div>
-                    <div className="flex flex-col items-end">
-                        <span className="text-[10px] font-bold text-neutral-500 uppercase mb-1">Invite Code</span>
-                        <div className="flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-lg border border-white/10">
-                            <code className="text-lg font-mono font-bold text-accent-glow">{group.inviteCode}</code>
+                    <div className="flex flex-col items-end gap-2">
+                        <Link
+                            href={`/groups/${group.id}/leaderboard`}
+                            className="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3 py-1.5 rounded-lg border border-white/10 flex items-center gap-2 transition-all"
+                        >
+                            <span>🏆 Leaderboard</span>
+                        </Link>
+                        <div className="flex flex-col items-end">
+                            <span className="text-[10px] font-bold text-neutral-500 uppercase mb-1">Invite Code</span>
+                            <div className="flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-lg border border-white/10">
+                                <code className="text-lg font-mono font-bold text-accent-glow">{group.inviteCode}</code>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -133,8 +141,8 @@ export default async function GroupDetailPage({
                                             </p>
                                         </div>
                                         <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider border ${incident.category.includes('GAIN')
-                                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                                                : "bg-red-500/10 text-red-400 border-red-500/20"
+                                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                            : "bg-red-500/10 text-red-400 border-red-500/20"
                                             }`}>
                                             {incident.category.includes('GAIN') ? '+' : ''}
                                             {incident.category.includes('SMALL') ? '5' : incident.category.includes('MODERATE') ? '10' : '20'} Aura

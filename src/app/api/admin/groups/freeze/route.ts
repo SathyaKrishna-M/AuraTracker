@@ -5,6 +5,8 @@ import prisma from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
 
+
+
 export async function POST(req: Request) {
     // @ts-ignore
     const session = await getServerSession(authOptions);
