@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { getAuraTitle } from "@/lib/aura-utils";
 import SignOutButton from "@/components/auth/sign-out-button";
+import Image from "next/image";
 import { User, Mail, Shield } from "lucide-react";
 
 export default async function ProfilePage() {
@@ -35,7 +36,7 @@ export default async function ProfilePage() {
                     <div className="relative">
                         <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-aura-border shadow-2xl">
                             {session.user.image ? (
-                                <img src={session.user.image} alt="Profile" className="w-full h-full object-cover" />
+                                <Image src={session.user.image} alt="Profile" width={96} height={96} className="w-full h-full object-cover" />
                             ) : (
                                 <div className="w-full h-full bg-aura-dark flex items-center justify-center">
                                     <User className="w-10 h-10 text-gray-600" />

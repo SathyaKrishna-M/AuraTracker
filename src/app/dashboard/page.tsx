@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import prisma from "@/lib/prisma";
 import { getAuraTitle, getAuraProgress } from "@/lib/aura-utils";
 import { Shield, Zap, TrendingUp, Clock, ArrowRight } from "lucide-react";
@@ -45,7 +46,7 @@ export default async function DashboardPage() {
                     <p className="text-accent font-medium">{user.name?.split(' ')[0]}</p>
                 </div>
                 <div className="h-10 w-10 rounded-full overflow-hidden border border-aura-border bg-aura-dark">
-                    {session.user.image && <img src={session.user.image} alt="Avatar" className="w-full h-full object-cover" />}
+                    {session.user.image && <Image src={session.user.image} alt="Avatar" width={40} height={40} className="w-full h-full object-cover" />}
                 </div>
             </div>
 

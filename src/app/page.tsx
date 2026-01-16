@@ -18,7 +18,7 @@ export default function Home() {
                         AuraTracker
                     </h1>
                     <p className="text-lg text-neutral-400 font-medium">
-                        The definitive tool for tracking your group's karma, reputation, and social standing.
+                        The definitive tool for tracking your group&apos;s karma, reputation, and social standing.
                     </p>
                 </div>
 

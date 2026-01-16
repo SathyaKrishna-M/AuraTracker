@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Shield, Zap, RefreshCw, Check } from "lucide-react";
+import Image from "next/image";
 
 interface UserRowProps {
     user: {
@@ -54,7 +55,7 @@ export default function UserRow({ user }: UserRowProps) {
         <div className="glass-panel p-4 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4 transition-colors hover:bg-white/5">
             <div className="flex items-center gap-4 w-full md:w-auto">
                 <div className="w-10 h-10 rounded-full bg-white/10 overflow-hidden shrink-0">
-                    {user.image && <img src={user.image} alt="" className="w-full h-full object-cover" />}
+                    {user.image && <Image src={user.image} alt="Profile" width={40} height={40} className="w-full h-full object-cover" />}
                 </div>
                 <div>
                     <div className="font-bold text-white flex items-center gap-2">

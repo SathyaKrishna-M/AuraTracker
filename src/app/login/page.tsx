@@ -29,7 +29,7 @@ export default async function LoginPage() {
                     AuraTracker
                 </h1>
                 <p className="mb-8 text-sm text-neutral-400">
-                    Enter the realm. Track your group's karma.
+                    Enter the realm. Track your group&apos;s karma.
                 </p>
 
                 <LoginButton />

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Shield, Users, Trophy, Activity, Copy, Check, Pen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import VoteButton from "@/components/vote-button";
@@ -234,7 +235,7 @@ export default function GroupDetailView({ group, incidents, currentUser }: Group
                                     <div className="flex-1 ml-3 flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-full bg-aura-black overflow-hidden border border-aura-border">
                                             {member.user.image ? (
-                                                <img src={member.user.image} alt="" className="w-full h-full object-cover" />
+                                                <Image src={member.user.image} alt="Avatar" width={32} height={32} className="w-full h-full object-cover" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center bg-gray-800 text-xs text-gray-500 font-bold">
                                                     {member.user.name?.[0]}
@@ -272,7 +273,7 @@ export default function GroupDetailView({ group, incidents, currentUser }: Group
                             <div key={member.user.id} className="bg-aura-dark border border-aura-border p-4 rounded-xl flex flex-col items-center text-center gap-2">
                                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-aura-border">
                                     {member.user.image ? (
-                                        <img src={member.user.image} alt="" className="w-full h-full object-cover" />
+                                        <Image src={member.user.image} alt="Avatar" width={48} height={48} className="w-full h-full object-cover" />
                                     ) : (
                                         <div className="w-full h-full bg-gray-800" />
                                     )}

@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Shield, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getAuraTitle } from "@/lib/aura-utils";
@@ -110,7 +111,7 @@ export default async function GroupLeaderboardPage({ params }: Props) {
                                         isCurrentUser ? "border-accent" : "border-aura-border"
                                     )}>
                                         {member.user.image ? (
-                                            <img src={member.user.image} alt="" className="w-full h-full object-cover" />
+                                            <Image src={member.user.image} alt="Avatar" width={40} height={40} className="w-full h-full object-cover" />
                                         ) : (
                                             <div className="w-full h-full bg-aura-black flex items-center justify-center text-xs font-bold text-gray-500">
                                                 {member.user.name?.[0]}
