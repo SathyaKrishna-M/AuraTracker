@@ -13,10 +13,14 @@ export async function POST(req: Request) {
     }
 
     try {
-        const { incidentId } = await req.json();
+        const { incidentId, voteType } = await req.json();
 
         if (!incidentId) {
             return new NextResponse("Incident ID required", { status: 400 });
+        }
+
+        if (voteType && !['APPROVE', 'DISAPPROVE'].includes(voteType)) {
+            return new NextResponse("Invalid vote type", { status: 400 });
         }
 
         // 1. Fetch Incident with details
@@ -76,42 +80,54 @@ export async function POST(req: Request) {
             await tx.incidentVote.create({
                 data: {
                     incidentId,
-                    userId: session.user.id
+                    userId: session.user.id,
+                    voteType: voteType || 'APPROVE' // Default for backward compatibility if needed, though client should send it
                 }
             });
 
-            // Get new count
-            const currentVotes = await tx.incidentVote.count({
-                where: { incidentId }
+            // Count votes by type
+            const approvalVotes = await tx.incidentVote.count({
+                where: { incidentId, voteType: 'APPROVE' }
+            });
+            const disapprovalVotes = await tx.incidentVote.count({
+                where: { incidentId, voteType: 'DISAPPROVE' }
             });
 
-            // Check Threshold
-            if (currentVotes >= incident.requiredVotes && incident.status === "PENDING") {
-                // Map Category to Delta
-                const delta = getAuraDelta(incident.category);
+            // Check Thresholds
+            if (incident.status === 'PENDING') {
+                if (approvalVotes >= incident.requiredVotes) {
+                    // VALIDATED Logic
+                    const delta = getAuraDelta(incident.category);
 
-                // Update Incident Status
-                await tx.incident.update({
-                    where: { id: incidentId },
-                    data: { status: "VALIDATED" }
-                });
+                    // Update Incident Status
+                    await tx.incident.update({
+                        where: { id: incidentId },
+                        data: { status: "VALIDATED" }
+                    });
 
-                // Update User Aura
-                await tx.user.update({
-                    where: { id: incident.targetUserId },
-                    data: { aura: { increment: delta } }
-                });
+                    // Update User Aura
+                    await tx.user.update({
+                        where: { id: incident.targetUserId },
+                        data: { aura: { increment: delta } }
+                    });
 
-                // RECORD HISTORY
-                await tx.auraHistory.create({
-                    data: {
-                        userId: incident.targetUserId,
-                        incidentId: incident.id,
-                        groupId: incident.groupId,
-                        delta: delta,
-                        reason: `Incident: ${incident.title}`
-                    }
-                });
+                    // RECORD HISTORY
+                    await tx.auraHistory.create({
+                        data: {
+                            userId: incident.targetUserId,
+                            incidentId: incident.id,
+                            groupId: incident.groupId,
+                            delta: delta,
+                            reason: `Incident: ${incident.title}`
+                        }
+                    });
+                } else if (disapprovalVotes >= incident.requiredVotes) {
+                    // EXPIRED Logic (Disapproved)
+                    await tx.incident.update({
+                        where: { id: incidentId },
+                        data: { status: "EXPIRED" }
+                    });
+                }
             }
         });
 

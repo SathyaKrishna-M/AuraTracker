@@ -119,7 +119,7 @@ export async function POST(req: Request) {
                 title,
                 description,
                 requiredVotes: Math.max(1, requiredVotes), // At least 1 vote
-                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
+                expiresAt: new Date(Date.now() + 3 * 60 * 60 * 1000), // 3h
                 status: "PENDING",
             },
         });

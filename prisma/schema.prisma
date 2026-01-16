@@ -138,9 +138,16 @@ model Incident {
   auraHistory AuraHistory[]
 }
 
+
+enum VoteType {
+  APPROVE
+  DISAPPROVE
+}
+
 model IncidentVote {
   incidentId String
   userId     String
+  voteType   VoteType @default(APPROVE)
   votedAt    DateTime @default(now())
 
   incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)

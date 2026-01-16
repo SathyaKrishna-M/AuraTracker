@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, AlertTriangle, X } from "lucide-react";
+import { useToast } from "@/lib/toast-context";
 
 interface Member {
     user: {
@@ -29,6 +30,7 @@ export default function CreateIncidentForm({ groupId, members }: CreateIncidentF
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const toast = useToast();
 
     const [targetUserId, setTargetUserId] = useState("");
     const [category, setCategory] = useState("SMALL_GAIN");
@@ -62,9 +64,10 @@ export default function CreateIncidentForm({ groupId, members }: CreateIncidentF
             setDescription("");
             setTargetUserId("");
             setCategory("SMALL_GAIN");
+            toast.success("Incident reported successfully!");
             router.refresh();
         } catch (error: any) {
-            alert(error.message);
+            toast.error(error.message);
         } finally {
             setLoading(false);
         }
@@ -124,8 +127,8 @@ export default function CreateIncidentForm({ groupId, members }: CreateIncidentF
                                 type="button"
                                 onClick={() => setCategory(c.value)}
                                 className={`text-left px-3 py-2 rounded-lg text-xs font-bold transition-all border ${category === c.value
-                                        ? `bg-white/10 border-accent text-white ring-1 ring-accent`
-                                        : "bg-black/30 border-transparent text-neutral-500 hover:bg-white/5"
+                                    ? `bg-white/10 border-accent text-white ring-1 ring-accent`
+                                    : "bg-black/30 border-transparent text-neutral-500 hover:bg-white/5"
                                     }`}
                             >
                                 <span className={category === c.value ? c.color : ""}>{c.label.split('●')[1]}</span>

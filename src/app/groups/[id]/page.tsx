@@ -37,10 +37,16 @@ export default async function GroupDetailPage({
     if (!group) return <div>Group not found</div>;
 
     const incidents = await prisma.incident.findMany({
-        where: { groupId: params.id },
+        where: {
+            groupId: params.id,
+            OR: [
+                { status: "VALIDATED" },
+                { status: "PENDING", expiresAt: { gt: new Date() } }
+            ]
+        },
         include: {
             targetUser: { select: { id: true, name: true } },
-            votes: { select: { userId: true } },
+            votes: { select: { userId: true, voteType: true } },
         },
         orderBy: { createdAt: "desc" },
         take: 30

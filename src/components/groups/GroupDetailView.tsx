@@ -150,7 +150,12 @@ export default function GroupDetailView({ group, incidents, currentUser }: Group
                                 </div>
                             ) : (
                                 incidents.map((incident) => {
-                                    const hasVoted = incident.votes.some((v: any) => v.userId === currentUser.id);
+                                    const userVote = incident.votes.find((v: any) => v.userId === currentUser.id);
+                                    const userVoteType = userVote ? (userVote.voteType || 'APPROVE') : null;
+
+                                    const approvalsCount = incident.votes.filter((v: any) => !v.voteType || v.voteType === 'APPROVE').length;
+                                    const disapprovalsCount = incident.votes.filter((v: any) => v.voteType === 'DISAPPROVE').length;
+
                                     const isTarget = incident.targetUserId === currentUser.id;
                                     const isGain = incident.category.includes('GAIN');
 
@@ -185,10 +190,11 @@ export default function GroupDetailView({ group, incidents, currentUser }: Group
                                                 </span>
                                                 <VoteButton
                                                     incidentId={incident.id}
-                                                    hasVoted={hasVoted}
+                                                    userVoteType={userVoteType}
                                                     isTarget={isTarget}
                                                     status={incident.status}
-                                                    currentVotes={incident.votes.length}
+                                                    approvalsCount={approvalsCount}
+                                                    disapprovalsCount={disapprovalsCount}
                                                     requiredVotes={incident.requiredVotes}
                                                 />
                                             </div>
